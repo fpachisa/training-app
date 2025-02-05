@@ -5,6 +5,36 @@ import TrainingSelection from './TrainingSelection';
 import AdminStats from './AdminStats';
 import UserTaskFilter from './UserTaskFilter';
 
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+    {/* Keep the header visible during loading */}
+    <nav className="bg-white shadow-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <span className="ml-3 text-lg font-semibold text-gray-900">Marathon Training</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {/* Loading spinner in the content area */}
+    <div className="flex-1 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
+        <p className="mt-4 text-sm text-gray-600">Loading your dashboard...</p>
+      </div>
+    </div>
+  </div>
+);
+
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
@@ -149,9 +179,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-      </div>
+      <LoadingSpinner />
     );
   }
 

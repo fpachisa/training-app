@@ -1,15 +1,26 @@
 // src/components/Login.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   
+  useEffect(() => {
+    // Check if user is already logged in
+    const user = localStorage.getItem('user');
+    if (user) {
+      navigate('/dashboard');
+    }
+    setIsLoading(false);
+  }, [navigate]);
+
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
+        setIsLoading(true);
         const userInfo = await axios.get(
           'https://www.googleapis.com/oauth2/v3/userinfo',
           {
@@ -32,19 +43,28 @@ const Login = () => {
       } catch (error) {
         console.error('Login error:', error);
         alert('Login failed. Please try again.');
+        setIsLoading(false);
       }
     },
     onError: () => {
       console.log('Login Failed');
       alert('Login failed. Please try again.');
+      setIsLoading(false);
     }
   });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center">
       <div className="w-full max-w-md mx-auto p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Logo/Icon */}
           <div className="mb-8 text-center">
             <div className="h-16 w-16 bg-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center">
               <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,14 +75,6 @@ const Login = () => {
             <p className="text-sm text-gray-600 mt-2">Sign in to access your training dashboard</p>
           </div>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-          </div>
-
-          {/* Sign in button */}
           <button
             onClick={() => login()}
             className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 border border-gray-300 rounded-lg shadow-sm transition-all hover:shadow-md"
@@ -74,19 +86,7 @@ const Login = () => {
             />
             Sign in with Google
           </button>
-
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-600">
-              By signing in, you agree to our Terms of Service and Privacy Policy
-            </p>
-          </div>
         </div>
-
-        {/* Bottom text */}
-        <p className="mt-8 text-center text-xs text-gray-600">
-          © 2024 Marathon Training. All rights reserved.
-        </p>
       </div>
     </div>
   );
