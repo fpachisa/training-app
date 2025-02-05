@@ -43,7 +43,7 @@ const Layout = ({ children }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <span className="ml-3 text-lg font-semibold text-gray-900">Marathon Training</span>
+                <span className="ml-3 text-lg font-semibold text-gray-900">Fittr Training Program</span>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ const Layout = ({ children }) => {
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-xs text-gray-500">
-            © 2024 Marathon Training. All rights reserved.
+            © 2025 Fittr Training. All rights reserved.
           </p>
         </div>
       </footer>
