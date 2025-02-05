@@ -1,20 +1,25 @@
 // src/components/TrainingSelection.js
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const TrainingSelection = () => {
     const navigate = useNavigate();
     const storedUser = JSON.parse(localStorage.getItem('user'));
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSelection = async (trainingType) => {
         try {
+            setIsLoading(true);
+            setError('');
+            
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/training-type`, {
                 userId: storedUser._id,
                 trainingType
             });
             
-            // Update local storage with new user data including training type
+            // Update local storage with new user data
             const updatedUser = {
                 ...storedUser,
                 trainingType: trainingType,
@@ -22,11 +27,13 @@ const TrainingSelection = () => {
             };
             localStorage.setItem('user', JSON.stringify(updatedUser));
             
-            // Force reload to update the dashboard
-            window.location.reload();
+            // Navigate to dashboard
+            navigate('/dashboard');
         } catch (error) {
             console.error('Error setting training type:', error);
-            alert('Failed to set training type. Please try again.');
+            setError(error.response?.data?.message || 'Failed to set training type. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -43,21 +50,39 @@ const TrainingSelection = () => {
                         </p>
                     </div>
 
+                    {error && (
+                        <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         <button
                             onClick={() => handleSelection('10K')}
-                            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-xl font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                            disabled={isLoading}
+                            className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-xl font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 ${
+                                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
                             10K Training
                         </button>
 
                         <button
                             onClick={() => handleSelection('HALF_MARATHON')}
-                            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-xl font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                            disabled={isLoading}
+                            className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-xl font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 ${
+                                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
                             Half Marathon Training
                         </button>
                     </div>
+
+                    {isLoading && (
+                        <div className="mt-4 text-center text-sm text-gray-600">
+                            Generating your training plan...
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

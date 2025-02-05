@@ -249,11 +249,21 @@ app.put('/api/tasks/:id', upload.single('screenshot'), async (req, res) => {
     }
 });
 
+// In server.js - Update the training type endpoint
 app.post('/api/users/training-type', async (req, res) => {
     try {
         const { userId, trainingType } = req.body;
         
-        // Update user's training type and first login status
+        // Check if user already has tasks
+        const existingTasks = await Task.find({ assignedTo: userId });
+        if (existingTasks.length > 0) {
+            return res.status(400).json({ 
+                error: 'Tasks already exist for this user',
+                message: 'Training plan has already been generated for this user.'
+            });
+        }
+
+        // Update user with training type
         const user = await User.findByIdAndUpdate(
             userId,
             { 
@@ -263,7 +273,11 @@ app.post('/api/users/training-type', async (req, res) => {
             { new: true }
         );
 
-        // Create predefined tasks for the user
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Get the appropriate task set based on training type
         const tasksToCreate = trainingType === 'HALF_MARATHON' 
             ? HALF_MARATHON_TASKS 
             : TEN_K_TASKS;
