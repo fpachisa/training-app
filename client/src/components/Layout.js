@@ -4,8 +4,25 @@ import { useNavigate } from 'react-router-dom';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // Add safe JSON parsing
+  let user = null;
+  try {
+    const userData = localStorage.getItem('user');
+    user = userData ? JSON.parse(userData) : null;
+  } catch (error) {
+    console.error('Error parsing user data:', error);
+    localStorage.removeItem('user');
+    navigate('/login');
+    return null;
+  }
+
+  // Redirect if no user data
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
 
   const handleLogout = () => {
     localStorage.clear();

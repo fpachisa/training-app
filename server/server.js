@@ -28,8 +28,9 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 // Middleware
+// At the top of your server.js
 const corsOptions = {
-    origin: 'http://localhost:3001', // React app's port
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
     credentials: true,
     optionsSuccessStatus: 200
 };
