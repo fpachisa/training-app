@@ -4,6 +4,7 @@ import axios from 'axios';
 import TrainingSelection from './TrainingSelection';
 import AdminStats from './AdminStats';
 import UserTaskFilter from './UserTaskFilter';
+import RaceCountdown from './RaceCountdown';
 
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -216,6 +217,10 @@ const Dashboard = () => {
         {/* Admin Statistics and Filters */}
         {user.role === 'admin' && (
           <>
+              <RaceCountdown 
+              raceDate={user.raceDate} 
+              trainingType={user.trainingType}
+            />
             <AdminStats users={users} tasks={tasks} />
             <UserTaskFilter 
               users={users}

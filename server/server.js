@@ -62,7 +62,13 @@ const userSchema = new mongoose.Schema({
     isFirstLogin: {
         type: Boolean,
         default: true
+    },
+    
+    raceDate: {
+        type: Date,
+        default: new Date('2025-04-27')
     }
+
 });
 
 const taskSchema = new mongoose.Schema({
@@ -263,6 +269,8 @@ app.post('/api/users/training-type', async (req, res) => {
             });
         }
 
+        const raceDate = new Date('2025-04-27');
+        
         // Update user with training type
         const user = await User.findByIdAndUpdate(
             userId,
