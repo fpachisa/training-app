@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 const TrainingSelection = () => {
     const navigate = useNavigate();
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+    const storedUser = JSON.parse(localStorage.getItem('user'));
 
     const handleSelection = async (trainingType) => {
         try {
@@ -28,11 +28,10 @@ const TrainingSelection = () => {
             localStorage.setItem('user', JSON.stringify(updatedUser));
             
             // Navigate to dashboard
-            navigate('/dashboard');
+            window.location.href = '/dashboard';
         } catch (error) {
             console.error('Error setting training type:', error);
             setError(error.response?.data?.message || 'Failed to set training type. Please try again.');
-        } finally {
             setIsLoading(false);
         }
     };
@@ -64,7 +63,7 @@ const TrainingSelection = () => {
                                 isLoading ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                         >
-                            10K Training
+                            {isLoading ? 'Setting up 10K Training...' : '10K Training'}
                         </button>
 
                         <button
@@ -74,13 +73,18 @@ const TrainingSelection = () => {
                                 isLoading ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                         >
-                            Half Marathon Training
+                            {isLoading ? 'Setting up Half Marathon Training...' : 'Half Marathon Training'}
                         </button>
                     </div>
 
                     {isLoading && (
-                        <div className="mt-4 text-center text-sm text-gray-600">
-                            Generating your training plan...
+                        <div className="mt-4">
+                            <div className="flex justify-center">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                            </div>
+                            <p className="text-center text-sm text-gray-600 mt-2">
+                                Generating your training plan...
+                            </p>
                         </div>
                     )}
                 </div>

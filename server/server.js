@@ -83,7 +83,12 @@ const taskSchema = new mongoose.Schema({
         enum: ['pending', 'completed'],
         default: 'pending'
     },
+    points: {
+        type: Number,
+        default: 10  // Default points for each task
+    },
     screenshot: String,
+    order: Number,
     createdAt: {
         type: Date,
         default: Date.now

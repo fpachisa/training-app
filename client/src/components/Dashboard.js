@@ -5,6 +5,7 @@ import TrainingSelection from './TrainingSelection';
 import AdminStats from './AdminStats';
 import UserTaskFilter from './UserTaskFilter';
 import RaceCountdown from './RaceCountdown';
+import ProgressBanner from './ProgressBanner';
 
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -214,10 +215,13 @@ const Dashboard = () => {
           </p>
         </div>
         {user && user.role !== 'admin' && (
-        <RaceCountdown 
-            raceDate={user.raceDate} 
-            trainingType={user.trainingType}
-        />
+        <>
+          <RaceCountdown 
+              raceDate={user.raceDate} 
+              trainingType={user.trainingType}
+          />
+          <ProgressBanner tasks={tasks} />
+        </>
       )}
         {/* Admin Statistics and Filters */}
         {user.role === 'admin' && (
