@@ -2,26 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* In src/index.css - Update the animation */
+/* In src/index.css */
 @keyframes run {
     0% {
-        transform: translateX(0) rotateY(0);
-    }
-    25% {
-        transform: translateX(10px) rotateY(0);
+        transform: translateX(0) scaleX(1);
     }
     50% {
-        transform: translateX(0) rotateY(0);
-    }
-    75% {
-        transform: translateX(-10px) rotateY(180deg);
+        transform: translateX(10px) scaleX(1.1);
     }
     100% {
-        transform: translateX(0) rotateY(0);
+        transform: translateX(0) scaleX(1);
     }
 }
 
 .animate-run {
-    animation: run 1.5s infinite;
+    animation: run 0.8s infinite;
     transform-origin: center;
+    fill: currentColor;
+    opacity: 0.9;
 }

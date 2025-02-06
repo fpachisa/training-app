@@ -1,89 +1,155 @@
-// Create a new file predefinedTasks.js in server directory
-const HALF_MARATHON_TASKS = [
-    {
-        title: "5K Easy Run",
-        description: "Complete a 5K run at an easy, conversational pace. Focus on form and breathing."
-    },
-    {
-        title: "Interval Training",
-        description: "8x400m intervals with 200m recovery jogs between each."
-    },
-    {
-        title: "Long Run - 10K",
-        description: "Complete a 10K run at a steady, comfortable pace."
-    },
-    {
-        title: "Cross Training",
-        description: "45 minutes of low-impact exercise (swimming, cycling, or elliptical)."
-    },
-    {
-        title: "Tempo Run",
-        description: "20-minute tempo run at half marathon goal pace."
-    },
-    {
-        title: "Hill Training",
-        description: "6x hill repeats of 400m each with walk/jog recovery."
-    },
-    {
-        title: "Long Run - 15K",
-        description: "Complete a 15K run at a steady, comfortable pace."
-    },
-    {
-        title: "Speed Work",
-        description: "6x800m at 5K race pace with 400m recovery jogs."
-    },
-    {
-        title: "Progressive Run",
-        description: "8K run, progressively increasing pace every 2K."
-    },
-    {
-        title: "Final Long Run",
-        description: "18K run at a comfortable pace. Practice race day nutrition."
-    }
-];
+// server/predefinedTasks.js
+const HALF_MARATHON_TASKS = {
+    week1: [
+        {
+            title: "Week 1 - Easy Run",
+            description: "5K at conversational pace. Focus on form.",
+            points: 10,
+            requiresScreenshot: true  // Requires proof of run
+        },
+        {
+            title: "Week 1 - Cross Training",
+            description: "30 minutes of low-impact exercise (swimming, cycling, or yoga)",
+            points: 10,
+            requiresScreenshot: false  // No screenshot needed for cross-training
+        }
+    ],
+    week2: [
+        {
+            title: "Week 2 - Intervals",
+            description: "6x400m intervals with 200m recovery jogs",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout completion
+        },
+        {
+            title: "Week 2 - Long Run",
+            description: "7K at steady pace",
+            points: 15,
+            requiresScreenshot: true  // Need to show distance covered
+        }
+    ],
+    // Example for more weeks...
+    week10: [
+        {
+            title: "Week 10 - Taper Run",
+            description: "Easy 5K, focus on maintaining form",
+            points: 10,
+            requiresScreenshot: true
+        },
+        {
+            title: "Week 10 - Race Preparation",
+            description: "Light 3K jog, mental preparation and gear check",
+            points: 10,
+            requiresScreenshot: false  // No screenshot needed for preparation task
+        }
+    ]
+};
 
-const TEN_K_TASKS = [
-    {
-        title: "3K Easy Run",
-        description: "Complete a 3K run at an easy, conversational pace."
-    },
-    {
-        title: "Interval Training",
-        description: "6x200m intervals with 100m recovery walks."
-    },
-    {
-        title: "5K Steady Run",
-        description: "Complete a 5K run at a steady, comfortable pace."
-    },
-    {
-        title: "Active Recovery",
-        description: "30 minutes of walking or light jogging."
-    },
-    {
-        title: "Speed Work",
-        description: "4x400m at 5K race pace with 200m recovery jogs."
-    },
-    {
-        title: "Hill Training",
-        description: "4x hill repeats of 200m each with walk recovery."
-    },
-    {
-        title: "Long Run - 7K",
-        description: "Complete a 7K run at an easy pace."
-    },
-    {
-        title: "Tempo Run",
-        description: "15-minute tempo run at 10K goal pace."
-    },
-    {
-        title: "Fartlek Training",
-        description: "30-minute run with alternating 2-minute fast/2-minute easy intervals."
-    },
-    {
-        title: "Final Preparation Run",
-        description: "8K run at a comfortable pace. Practice race day strategy."
-    }
-];
+const TEN_K_TASKS = {
+    week1: [
+        {
+            title: "Week 1 - Base Run",
+            description: "3K easy run at conversational pace",
+            points: 10,
+            requiresScreenshot: true  // Need to show completion of run
+        },
+        {
+            title: "Week 1 - Strength",
+            description: "Basic strength training routine for runners",
+            points: 10,
+            requiresScreenshot: false  // No screenshot needed for strength training
+        }
+    ],
+    week2: [
+        {
+            title: "Week 2 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
+        {
+            title: "Week 2 - Distance Run",
+            description: "4K at comfortable pace",
+            points: 15,
+            requiresScreenshot: true  // Need to show distance
+        }
+    ],
+
+    week3: [
+        {
+            title: "Week 3 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
+        {
+            title: "Week 3 - Distance Run",
+            description: "4K at comfortable pace",
+            points: 15,
+            requiresScreenshot: true  // Need to show distance
+        }
+    ],
+
+    week4: [
+        {
+            title: "Week 4 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
+        {
+            title: "Week 4 - Distance Run",
+            description: "4K at comfortable pace",
+            points: 15,
+            requiresScreenshot: false  // Need to show distance
+        }
+    ],    
+
+    week5: [
+        {
+            title: "Week 5 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
+        {
+            title: "Week 5 - Distance Run",
+            description: "4K at comfortable pace",
+            points: 15,
+            requiresScreenshot: true  // Need to show distance
+        }
+    ],
+    
+    week6: [
+        {
+            title: "Week 6 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
+        {
+            title: "Week 6 - Distance Run",
+            description: "4K at comfortable pace",
+            points: 15,
+            requiresScreenshot: true  // Need to show distance
+        }
+    ],   
+
+    week10: [
+        {
+            title: "Week 10 - Easy Run",
+            description: "Light 3K, focus on form and breathing",
+            points: 10,
+            requiresScreenshot: true
+        },
+        {
+            title: "Week 10 - Pre-race",
+            description: "2K jog, gear preparation and strategy review",
+            points: 10,
+            requiresScreenshot: false  // No screenshot needed for preparation
+        }
+    ]
+};
 
 module.exports = {
     HALF_MARATHON_TASKS,

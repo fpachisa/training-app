@@ -1,5 +1,6 @@
 // src/components/RaceCountdown.js
 import React, { useState, useEffect } from 'react';
+import runningIcon from '../images/running-icon.gif';
 
 const RaceCountdown = ({ raceDate, trainingType }) => {
     const [daysToGo, setDaysToGo] = useState(0);
@@ -8,12 +9,11 @@ const RaceCountdown = ({ raceDate, trainingType }) => {
     useEffect(() => {
         const calculateDaysToGo = () => {
             const now = new Date();
-            const race = new Date('2025-04-27'); // Hardcoded race date
+            const race = new Date('2025-04-27');
             const diffTime = race - now;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             setDaysToGo(diffDays);
 
-            // Format the date
             const options = { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -24,7 +24,6 @@ const RaceCountdown = ({ raceDate, trainingType }) => {
         };
 
         calculateDaysToGo();
-        // Update countdown every day
         const timer = setInterval(calculateDaysToGo, 86400000);
         return () => clearInterval(timer);
     }, []);
@@ -41,18 +40,13 @@ const RaceCountdown = ({ raceDate, trainingType }) => {
                 </div>
                 
                 <div className="flex items-center gap-6">
-                    {/* Running man animation */}
+                    {/* Running Icon GIF */}
                     <div className="hidden md:block">
-                        <div className="w-20 h-20">
-                            <svg 
-                                className="animate-run" 
-                                viewBox="0 0 24 24" 
-                                fill="currentColor"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4 5.28c-1.23-.37-2.22-1.17-2.8-2.18l-1-1.6c-.41-.65-1.11-1-1.84-1-.78 0-1.59.5-1.78 1.44S7 23 7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3c1 1.15 2.41 2.01 4 2.34V23H19V9h-1.5v1.78zM7.43 13.13l-2.12-.41c-.54-.11-.9-.63-.79-1.17l.76-3.93c.21-1.08 1.26-1.79 2.34-1.58l1.16.23-1.35 6.86z" />
-                            </svg>
-                        </div>
+                        <img 
+                            src={runningIcon} 
+                            alt="Running" 
+                            className="w-24 h-24 object-contain"
+                        />
                     </div>
 
                     {/* Countdown display */}

@@ -71,6 +71,7 @@ const userSchema = new mongoose.Schema({
 
 });
 
+// In server.js - Update Task schema
 const taskSchema = new mongoose.Schema({
     title: String,
     description: String,
@@ -85,13 +86,19 @@ const taskSchema = new mongoose.Schema({
     },
     points: {
         type: Number,
-        default: 10  // Default points for each task
+        default: 10
+    },
+    requiresScreenshot: {
+        type: Boolean,
+        default: false
     },
     screenshot: String,
+    week: Number,
+    weekStartDate: Date,
     order: Number,
-    createdAt: {
-        type: Date,
-        default: Date.now
+    trainingType: {
+        type: String,
+        enum: ['10K', 'HALF_MARATHON']
     }
 });
 
@@ -274,14 +281,13 @@ app.post('/api/users/training-type', async (req, res) => {
             });
         }
 
-        const raceDate = new Date('2025-04-27');
-        
-        // Update user with training type
+        // Update user with training type and race date
         const user = await User.findByIdAndUpdate(
             userId,
             { 
                 trainingType,
-                isFirstLogin: false
+                isFirstLogin: false,
+                raceDate: new Date('2025-04-27')
             },
             { new: true }
         );
@@ -291,18 +297,33 @@ app.post('/api/users/training-type', async (req, res) => {
         }
 
         // Get the appropriate task set based on training type
-        const tasksToCreate = trainingType === 'HALF_MARATHON' 
+        const taskSet = trainingType === 'HALF_MARATHON' 
             ? HALF_MARATHON_TASKS 
             : TEN_K_TASKS;
 
-        // Create all tasks for the user
-        await Promise.all(tasksToCreate.map(async (task, index) => {
-            await Task.create({
-                ...task,
-                assignedTo: userId,
-                order: index + 1
-            });
-        }));
+        // Create tasks for each week
+        const programStartDate = new Date('2025-02-10');
+
+        // Loop through each week
+        for (let weekNum = 1; weekNum <= 10; weekNum++) {
+            const weekTasks = taskSet[`week${weekNum}`];
+            const weekStartDate = new Date(programStartDate);
+            weekStartDate.setDate(weekStartDate.getDate() + (weekNum - 1) * 7);
+
+            // Create each task for this week
+            if (weekTasks) {
+                await Promise.all(weekTasks.map(async (task, index) => {
+                    await Task.create({
+                        ...task,
+                        assignedTo: userId,
+                        week: weekNum,
+                        weekStartDate: weekStartDate,
+                        order: index + 1,
+                        trainingType
+                    });
+                }));
+            }
+        }
 
         res.json({ user });
     } catch (error) {
@@ -310,6 +331,7 @@ app.post('/api/users/training-type', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // 4. Get Tasks
 // In server.js - Update the GET /api/tasks endpoint
@@ -338,6 +360,28 @@ app.get('/api/tasks', async (req, res) => {
         res.json(tasks);
     } catch (error) {
         console.error('Error fetching tasks:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add this endpoint to your server.js
+app.put('/api/tasks/:id/complete', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const task = await Task.findByIdAndUpdate(
+            id,
+            { status: 'completed' },
+            { new: true }
+        );
+
+        if (!task) {
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        res.json(task);
+    } catch (error) {
+        console.error('Error completing task:', error);
         res.status(500).json({ error: error.message });
     }
 });

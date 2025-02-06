@@ -1,41 +1,13 @@
 // src/components/Dashboard.js
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TrainingSelection from './TrainingSelection';
 import AdminStats from './AdminStats';
 import UserTaskFilter from './UserTaskFilter';
 import RaceCountdown from './RaceCountdown';
+import WeeklyTaskView from './WeeklyTaskView';
 import ProgressBanner from './ProgressBanner';
-
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-gray-50 flex flex-col">
-    {/* Keep the header visible during loading */}
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="ml-3 text-lg font-semibold text-gray-900">Marathon Training</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    {/* Loading spinner in the content area */}
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
-        <p className="mt-4 text-sm text-gray-600">Loading your dashboard...</p>
-      </div>
-    </div>
-  </div>
-);
+import WeeklyProgress from './WeeklyProgress';
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -48,8 +20,20 @@ const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [taskStats, setTaskStats] = useState(null);
 
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    console.log('Stored user data:', storedUser);
+    if (storedUser) {
+      setUser(storedUser);
+      fetchTasks(storedUser);
+      if (storedUser.role === 'admin') {
+        fetchUsers();
+      }
+    }
+    setLoading(false);
+  }, []);
 
-  const fetchTasks = useCallback(async (currentUser) => {
+  const fetchTasks = async (currentUser) => {
     try {
       const queryParams = { 
         userId: currentUser._id, 
@@ -80,21 +64,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
-  }, [selectedUser]); // Add selectedUser as a dependency
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    console.log('Stored user data:', storedUser);
-    if (storedUser) {
-      setUser(storedUser);
-      fetchTasks(storedUser);
-      if (storedUser.role === 'admin') {
-        fetchUsers();
-      }
-    }
-    setLoading(false);
-  }, [fetchTasks]); // Add fetchTasks as a dependency
-
+  };
 
   const fetchUsers = async () => {
     try {
@@ -179,9 +149,23 @@ const Dashboard = () => {
     }
   };
 
+ // Add this function to your Dashboard component
+const handleTaskCompletion = async (taskId) => {
+  try {
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`);
+      fetchTasks(user);
+      alert('Task completed successfully!');
+  } catch (error) {
+      console.error('Error completing task:', error);
+      alert('Failed to complete task. Please try again.');
+  }
+}; 
+
   if (loading) {
     return (
-      <LoadingSpinner />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      </div>
     );
   }
 
@@ -214,16 +198,25 @@ const Dashboard = () => {
               : `Track your progress in ${user.trainingType} training`}
           </p>
         </div>
-        {user && user.role !== 'admin' && (
-        <>
-          <RaceCountdown 
-              raceDate={user.raceDate} 
-              trainingType={user.trainingType}
+
+        {/* User Specific Components */}
+        {user.role !== 'admin' && (
+          <>
+          <RaceCountdown raceDate={user.raceDate} trainingType={user.trainingType} />
+          <WeeklyProgress tasks={tasks} />
+          <WeeklyTaskView
+              tasks={tasks}
+              user={user}
+              handleFileSelect={handleFileSelect}
+              handleFileUpload={handleFileUpload}
+              previewImage={previewImage}
+              uploading={uploading}
+              handleTaskCompletion={handleTaskCompletion}
           />
-          <ProgressBanner tasks={tasks} />
-        </>
-      )}
-        {/* Admin Statistics and Filters */}
+          </>
+        )}
+
+        {/* Admin Specific Components */}
         {user.role === 'admin' && (
           <>
             <AdminStats users={users} tasks={tasks} />
@@ -233,147 +226,57 @@ const Dashboard = () => {
               onUserChange={handleUserChange}
               taskStats={taskStats}
             />
-          </>
-        )}
+            
 
-        {/* Admin Task Creation Form */}
-        {user.role === 'admin' && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Create New Task</h2>
-            <form onSubmit={createTask} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <input
-                  type="text"
-                  placeholder="Task Title"
-                  value={newTask.title}
-                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
-                <select
-                  value={newTask.assignedTo}
-                  onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                >
-                  <option value="">Select User</option>
-                  {users.map(user => (
-                    <option key={user._id} value={user._id}>
-                      {user.name} ({user.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <input
-                type="text"
-                placeholder="Description"
-                value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-              <button
-                type="submit"
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Create Task
-              </button>
-            </form>
-          </div>
-        )}
 
-        {/* Tasks List */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="grid gap-6 p-6">
-            {tasks.length === 0 ? (
-              <div className="text-center py-6">
-                <p className="text-gray-500">No tasks found</p>
-              </div>
-            ) : (
-              tasks.map(task => (
-                <div
-                  key={task._id}
-                  className={`border rounded-lg p-6 ${
-                    task.status === 'completed' ? 'bg-green-50' : 'bg-white'
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
-                      <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+            {/* Admin Task List */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="grid gap-6 p-6">
+                {tasks.map(task => (
+                  <div
+                    key={task._id}
+                    className={`border rounded-lg p-6 ${
+                      task.status === 'completed' ? 'bg-green-50' : 'bg-white'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                        <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                      </div>
+                      {task.assignedTo && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                          Assigned to: {task.assignedTo.name}
+                        </span>
+                      )}
                     </div>
-                    {user.role === 'admin' && task.assignedTo && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                        Assigned to: {task.assignedTo.name}
+
+                    <div className="mt-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        task.status === 'completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {task.status}
                       </span>
-                    )}
-                  </div>
+                    </div>
 
-                  <div className="mt-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      task.status === 'completed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {task.status}
-                    </span>
-
-                    {user.role !== 'admin' && task.status === 'pending' && (
+                    {task.screenshot && (
                       <div className="mt-4">
-                        <div className="flex gap-4">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFileSelect(task._id, e.target.files[0])}
-                            className="hidden"
-                            id={`file-upload-${task._id}`}
-                          />
-                          <label
-                            htmlFor={`file-upload-${task._id}`}
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
-                          >
-                            Upload Screenshot
-                          </label>
-
-                          {previewImage && previewImage.taskId === task._id && (
-                            <button
-                              onClick={() => handleFileUpload(task._id, document.getElementById(`file-upload-${task._id}`).files[0])}
-                              disabled={uploading}
-                              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                            >
-                              {uploading ? 'Uploading...' : 'Complete Task'}
-                            </button>
-                          )}
-                        </div>
-
-                        {previewImage && previewImage.taskId === task._id && (
-                          <div className="mt-4">
-                            <img
-                              src={previewImage.url}
-                              alt="Preview"
-                              className="h-48 w-auto rounded-lg object-cover"
-                            />
-                          </div>
-                        )}
+                        <p className="text-sm font-medium text-gray-700 mb-2">Completion Screenshot:</p>
+                        <img
+                          src={task.screenshot}
+                          alt="Task completion"
+                          className="h-48 w-auto rounded-lg object-cover"
+                        />
                       </div>
                     )}
                   </div>
-
-                  {task.screenshot && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Completion Screenshot:</p>
-                      <img
-                        src={task.screenshot}
-                        alt="Task completion"
-                        className="h-48 w-auto rounded-lg object-cover"
-                      />
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
