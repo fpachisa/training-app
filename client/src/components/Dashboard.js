@@ -213,14 +213,15 @@ const Dashboard = () => {
               : `Track your progress in ${user.trainingType} training`}
           </p>
         </div>
-
+        {user && user.role !== 'admin' && (
+        <RaceCountdown 
+            raceDate={user.raceDate} 
+            trainingType={user.trainingType}
+        />
+      )}
         {/* Admin Statistics and Filters */}
         {user.role === 'admin' && (
           <>
-              <RaceCountdown 
-              raceDate={user.raceDate} 
-              trainingType={user.trainingType}
-            />
             <AdminStats users={users} tasks={tasks} />
             <UserTaskFilter 
               users={users}
