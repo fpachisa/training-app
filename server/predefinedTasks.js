@@ -19,6 +19,12 @@ const HALF_MARATHON_TASKS = {
             points: 15,
             requiresScreenshot: true  // Need to show interval workout completion
         },
+        {
+            title: "Week 1 - Long Run",
+            description: "6x400m intervals with 200m recovery jogs",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout completion
+        },
     ],
     week2: [
         {
