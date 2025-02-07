@@ -334,7 +334,8 @@ app.post('/api/users/training-type', async (req, res) => {
 
 // 4. Get Tasks
 // In server.js - Update the GET /api/tasks endpoint
-app.get('/api/tasks', async (req, res) => {
+app.options('/api/tasks/sync', cors());
+app.get('/api/tasks', cors(), async (req, res) => {
     try {
         const { userId, role, filterUserId } = req.query;
         let query = {};
