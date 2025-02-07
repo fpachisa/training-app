@@ -12,7 +12,7 @@ const HALF_MARATHON_TASKS = {
             description: "30 minutes of low-impact exercise (swimming, cycling, or yoga)",
             points: 10,
             requiresScreenshot: false  // No screenshot needed for cross-training
-        }
+        },
     ],
     week2: [
         {
@@ -58,7 +58,13 @@ const TEN_K_TASKS = {
             description: "Basic strength training routine for runners",
             points: 10,
             requiresScreenshot: false  // No screenshot needed for strength training
-        }
+        },
+        {
+            title: "Week 1 - Speed Work",
+            description: "4x200m intervals with walking recovery",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout
+        },
     ],
     week2: [
         {

@@ -226,55 +226,74 @@ const handleTaskCompletion = async (taskId) => {
               onUserChange={handleUserChange}
               taskStats={taskStats}
             />
-            
-
 
             {/* Admin Task List */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="grid gap-6 p-6">
-                {tasks.map(task => (
-                  <div
-                    key={task._id}
-                    className={`border rounded-lg p-6 ${
-                      task.status === 'completed' ? 'bg-green-50' : 'bg-white'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
-                        <p className="mt-1 text-sm text-gray-600">{task.description}</p>
-                      </div>
-                      {task.assignedTo && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                          Assigned to: {task.assignedTo.name}
-                        </span>
-                      )}
-                    </div>
 
-                    <div className="mt-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        task.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {task.status}
-                      </span>
-                    </div>
+          <div className="bg-white rounded-lg shadow">
+              {/* Group and sort tasks by week */}
+              {Array.from({ length: 10 }, (_, i) => i + 1).map(weekNum => {
+                  const weekTasks = tasks.filter(task => task.week === weekNum);
+                  if (weekTasks.length === 0) return null;
 
-                    {task.screenshot && (
-                      <div className="mt-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Completion Screenshot:</p>
-                        <img
-                          src={task.screenshot}
-                          alt="Task completion"
-                          className="h-48 w-auto rounded-lg object-cover"
-                        />
+                  return (
+                      <div key={weekNum} className="border-b last:border-b-0">
+                          <div className="bg-gray-50 px-6 py-3">
+                              <h3 className="text-lg font-medium text-gray-900">Week {weekNum}</h3>
+                          </div>
+                          <div className="p-6 space-y-6">
+                              {weekTasks.map(task => (
+                                  <div
+                                      key={task._id}
+                                      className={`border rounded-lg p-6 ${
+                                          task.status === 'completed' ? 'bg-green-50' : 'bg-white'
+                                      }`}
+                                  >
+                                      <div className="flex justify-between items-start">
+                                          <div>
+                                              <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                                              <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                                              <div className="mt-2 flex items-center gap-4">
+                                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                      task.status === 'completed' 
+                                                          ? 'bg-green-100 text-green-800' 
+                                                          : 'bg-yellow-100 text-yellow-800'
+                                                  }`}>
+                                                      {task.status}
+                                                  </span>
+                                                  <span className="text-sm text-gray-500">
+                                                      {task.points} points
+                                                  </span>
+                                                  {task.requiresScreenshot && (
+                                                      <span className="text-sm text-gray-500">
+                                                          Screenshot required
+                                                      </span>
+                                                  )}
+                                              </div>
+                                          </div>
+                                          {task.assignedTo && (
+                                              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                                  {task.assignedTo.name}
+                                              </span>
+                                          )}
+                                      </div>
+
+                                      {task.screenshot && (
+                                          <div className="mt-4">
+                                              <p className="text-sm font-medium text-gray-700 mb-2">Completion Screenshot:</p>
+                                              <img
+                                                  src={task.screenshot}
+                                                  alt="Task completion"
+                                                  className="h-48 w-auto rounded-lg object-cover"
+                                              />
+                                          </div>
+                                      )}
+                                  </div>
+                              ))}
+                          </div>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+                  );
+              })}
+          </div>
           </>
         )}
       </div>

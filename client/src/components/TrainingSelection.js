@@ -67,7 +67,7 @@ const TrainingSelection = () => {
                         </button>
 
                         <button
-                            onClick={() => handleSelection('HALF_MARATHON')}
+                            onClick={() => handleSelection('HALF-MARATHON')}
                             disabled={isLoading}
                             className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-xl font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 ${
                                 isLoading ? 'opacity-50 cursor-not-allowed' : ''

@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema({
     },
     trainingType: {
         type: String,
-        enum: ['10K', 'HALF_MARATHON', null],
+        enum: ['10K', 'HALF-MARATHON', null],
         default: null
     },
     isFirstLogin: {
@@ -98,7 +98,7 @@ const taskSchema = new mongoose.Schema({
     order: Number,
     trainingType: {
         type: String,
-        enum: ['10K', 'HALF_MARATHON']
+        enum: ['10K', 'HALF-MARATHON']
     }
 });
 
@@ -267,7 +267,7 @@ app.put('/api/tasks/:id', upload.single('screenshot'), async (req, res) => {
     }
 });
 
-// In server.js - Update the training type endpoint
+// In server.js
 app.post('/api/users/training-type', async (req, res) => {
     try {
         const { userId, trainingType } = req.body;
@@ -297,7 +297,7 @@ app.post('/api/users/training-type', async (req, res) => {
         }
 
         // Get the appropriate task set based on training type
-        const taskSet = trainingType === 'HALF_MARATHON' 
+        const taskSet = trainingType === 'HALF-MARATHON' 
             ? HALF_MARATHON_TASKS 
             : TEN_K_TASKS;
 
@@ -332,7 +332,6 @@ app.post('/api/users/training-type', async (req, res) => {
     }
 });
 
-
 // 4. Get Tasks
 // In server.js - Update the GET /api/tasks endpoint
 app.get('/api/tasks', async (req, res) => {
@@ -354,7 +353,7 @@ app.get('/api/tasks', async (req, res) => {
 
         const tasks = await Task.find(query)
             .populate('assignedTo', 'name email trainingType')
-            .sort({ createdAt: -1 });
+            .sort({ week: 1, order: 1, createdAt: 1 });
 
         console.log(`Found ${tasks.length} tasks for query:`, query);
         res.json(tasks);
@@ -382,6 +381,62 @@ app.put('/api/tasks/:id/complete', async (req, res) => {
         res.json(task);
     } catch (error) {
         console.error('Error completing task:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// In server.js - Add new endpoint for syncing tasks
+app.post('/api/tasks/sync', async (req, res) => {
+    try {
+        // Get all users
+        const users = await User.find({ role: 'user' });
+
+        for (const user of users) {
+            if (!user.trainingType) continue; // Skip users who haven't selected training type
+
+            // Get task template based on user's training type
+            const taskSet = user.trainingType === 'HALF-MARATHON' 
+                ? HALF_MARATHON_TASKS 
+                : TEN_K_TASKS;
+
+            const programStartDate = new Date('2025-02-02');
+
+            // Go through each week
+            for (let weekNum = 1; weekNum <= 10; weekNum++) {
+                const weekTasks = taskSet[`week${weekNum}`];
+                const weekStartDate = new Date(programStartDate);
+                weekStartDate.setDate(weekStartDate.getDate() + (weekNum - 1) * 7);
+
+                if (weekTasks) {
+                    // Get existing tasks for this user and week
+                    const existingTasks = await Task.find({
+                        assignedTo: user._id,
+                        week: weekNum
+                    });
+
+                    // Create array of existing task titles for comparison
+                    const existingTaskTitles = existingTasks.map(task => task.title);
+
+                    // Add only new tasks that don't exist yet
+                    for (const taskTemplate of weekTasks) {
+                        if (!existingTaskTitles.includes(taskTemplate.title)) {
+                            await Task.create({
+                                ...taskTemplate,
+                                assignedTo: user._id,
+                                week: weekNum,
+                                weekStartDate: weekStartDate,
+                                trainingType: user.trainingType
+                            });
+                            console.log(`Added new task "${taskTemplate.title}" for user ${user.email}`);
+                        }
+                    }
+                }
+            }
+        }
+
+        res.json({ message: 'Tasks synchronized successfully' });
+    } catch (error) {
+        console.error('Error syncing tasks:', error);
         res.status(500).json({ error: error.message });
     }
 });

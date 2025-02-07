@@ -5,16 +5,22 @@ import { getCurrentWeek } from '../utils/dateUtils';
 const WeeklyProgress = ({ tasks }) => {
     const currentWeek = getCurrentWeek();
 
-    // Calculate progress for a specific week
+    // Calculate progress for a specific week based on points
     const calculateWeekProgress = (weekNumber) => {
         const weekTasks = tasks.filter(task => task.week === weekNumber);
         if (weekTasks.length === 0) return 0;
 
-        const completedTasks = weekTasks.filter(task => task.status === 'completed');
+        const totalPoints = weekTasks.reduce((sum, task) => sum + task.points, 0);
+        const earnedPoints = weekTasks
+            .filter(task => task.status === 'completed')
+            .reduce((sum, task) => sum + task.points, 0);
+
         return {
-            percentage: Math.round((completedTasks.length / weekTasks.length) * 100),
-            completed: completedTasks.length,
-            total: weekTasks.length
+            percentage: Math.round((earnedPoints / totalPoints) * 100),
+            earnedPoints,
+            totalPoints,
+            completedTasks: weekTasks.filter(task => task.status === 'completed').length,
+            totalTasks: weekTasks.length
         };
     };
 
@@ -36,15 +42,17 @@ const WeeklyProgress = ({ tasks }) => {
                     <h3 className="text-lg font-semibold text-gray-900">
                         Week {currentWeek} Progress
                     </h3>
-                    <span className="text-sm font-medium text-gray-600">
-                        {currentWeekProgress.completed} of {currentWeekProgress.total} tasks completed
-                    </span>
+                    <div className="text-sm font-medium text-gray-600">
+                        <span>{currentWeekProgress.earnedPoints} of {currentWeekProgress.totalPoints} points earned</span>
+                        <span className="mx-2">|</span>
+                        <span>{currentWeekProgress.completedTasks} of {currentWeekProgress.totalTasks} tasks completed</span>
+                    </div>
                 </div>
                 <div className="relative pt-1">
                     <div className="flex mb-2 items-center justify-between">
                         <div>
                             <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200">
-                                Current Progress
+                                Points Progress
                             </span>
                         </div>
                         <div className="text-right">
@@ -81,6 +89,9 @@ const WeeklyProgress = ({ tasks }) => {
                                 <div className="text-xs font-medium mb-1">Week {week.weekNumber}</div>
                                 <div className="text-lg font-bold">
                                     {week.percentage}%
+                                </div>
+                                <div className="text-xs text-gray-600 mt-1">
+                                    {week.earnedPoints}/{week.totalPoints} pts
                                 </div>
                             </div>
                         ))}

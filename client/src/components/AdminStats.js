@@ -13,7 +13,7 @@ const AdminStats = ({ users, tasks }) => {
             totalUsers: regularUsers.length,
             userTypeBreakdown: {
                 '10K': regularUsers.filter(user => user.trainingType === '10K').length,
-                'HALF_MARATHON': regularUsers.filter(user => user.trainingType === 'HALF_MARATHON').length
+                'HALF-MARATHON': regularUsers.filter(user => user.trainingType === 'HALF-MARATHON').length
             },
             taskCompletion: {
                 completed: tasks.filter(task => task.status === 'completed').length,
@@ -58,7 +58,7 @@ const AdminStats = ({ users, tasks }) => {
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-gray-600">Half Marathon</span>
-                        <span className="font-semibold text-indigo-600">{stats.userTypeBreakdown['HALF_MARATHON']}</span>
+                        <span className="font-semibold text-indigo-600">{stats.userTypeBreakdown['HALF-MARATHON']}</span>
                     </div>
                 </div>
             </div>
