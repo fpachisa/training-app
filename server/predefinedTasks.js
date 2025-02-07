@@ -13,6 +13,12 @@ const HALF_MARATHON_TASKS = {
             points: 10,
             requiresScreenshot: false  // No screenshot needed for cross-training
         },
+        {
+            title: "Week 1 - Intervals",
+            description: "6x400m intervals with 200m recovery jogs",
+            points: 15,
+            requiresScreenshot: true  // Need to show interval workout completion
+        },
     ],
     week2: [
         {
