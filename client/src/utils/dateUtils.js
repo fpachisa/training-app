@@ -1,5 +1,5 @@
 // src/utils/dateUtils.js
-export const PROGRAM_START_DATE = new Date('2025-02-02');
+export const PROGRAM_START_DATE = new Date('2025-02-10');
 export const PROGRAM_END_DATE = new Date('2025-04-27');
 
 export const getWeekDates = () => {
